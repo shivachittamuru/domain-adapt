@@ -1,0 +1,14 @@
+[project]
+name = "domain-adapt"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.3.0",
+]
+
+[[tool.uv.index]]
+url = "https://packagefeedproxy.microsoft.io/pypi/simple"
+default = true
