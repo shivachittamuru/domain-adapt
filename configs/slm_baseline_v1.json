@@ -1,0 +1,26 @@
+{
+  "config_version": 1,
+  "name": "ministral-3b-minimal-schema-v1",
+  "provider": "azure_foundry",
+  "api": "chat_completions",
+  "deployment_env": "AZURE_SLM_MODEL_DEPLOYMENT_NAME",
+  "catalog_model": "Ministral-3B",
+  "observed_response_model": "ministral-3b-2410",
+  "instructions": "You translate natural-language questions into SQLite SQL.\n\nReturn exactly one executable SQLite query.\nUse only the tables and columns in the supplied schema.\nDo not include Markdown, code fences, comments, or explanations.\nDo not invent tables or columns.",
+  "max_tokens": 2000,
+  "context": {
+    "schema": "table names, column names, and declared types only",
+    "sample_rows": 0,
+    "few_shot_examples": 0,
+    "glossary": false,
+    "relationships": false,
+    "retrieval": false
+  },
+  "generation": {
+    "attempts_per_question": 1,
+    "temperature": "provider_default",
+    "candidate_sql_repair": false,
+    "retry_incorrect_answers": false,
+    "strip_outer_whitespace": true
+  }
+}
