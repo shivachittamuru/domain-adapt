@@ -1,0 +1,112 @@
+{
+  "manifest_version": 1,
+  "benchmark": "domain-adapt-financial-v1",
+  "created_on": "2026-09-25",
+  "source": {
+    "dataset_repository": "domyn/FINCH",
+    "dataset_file": "finch_dataset.json",
+    "dataset_sha256": "c1e462743e4891fecf0fc10dbc6b0eb554fac56a186bdeedec9ccd662e0a4130",
+    "database_file": "text2sql-db/text2sql/bird/financial.sqlite",
+    "database_sha256": "d15d89cdb068a202b6f2b99342af44dffc1d52545b39ceaf62efdc0ba570101e",
+    "license": "CC-BY-NC-4.0"
+  },
+  "scope": {
+    "db_name": "bird",
+    "db_id": "financial",
+    "upstream_partition": "dev"
+  },
+  "selection": {
+    "algorithm": "SHA-256 rank within difficulty using '{salt}:{difficulty}:{question_id}'",
+    "salt": "domain-adapt-financial-v1",
+    "orientation_exclusions": [
+      1,
+      2,
+      3
+    ],
+    "ambiguous_reference_exclusions": [
+      37,
+      43,
+      104
+    ],
+    "working_dev": {
+      "ids": [
+        5,
+        11,
+        14,
+        16,
+        45,
+        49,
+        61,
+        69,
+        81,
+        89,
+        99,
+        105
+      ],
+      "difficulty_counts": {
+        "easy": 6,
+        "medium": 4,
+        "hard": 2
+      }
+    },
+    "frozen_eval": {
+      "ids": [
+        4,
+        6,
+        10,
+        12,
+        13,
+        17,
+        28,
+        29,
+        30,
+        31,
+        35,
+        38,
+        39,
+        41,
+        47,
+        52,
+        53,
+        58,
+        62,
+        80,
+        82,
+        85,
+        93,
+        96
+      ],
+      "difficulty_counts": {
+        "easy": 12,
+        "medium": 9,
+        "hard": 3
+      }
+    }
+  },
+  "reference_compatibility": {
+    "scope": "reference_sql_only",
+    "rules": [
+      {
+        "id": "sqlite_four_digit_year",
+        "description": "Replace unsupported SQLite STRFTIME('%y', ...) with STRFTIME('%Y', ...)."
+      },
+      {
+        "id": "case_insensitive_text_equality",
+        "description": "Apply COLLATE NOCASE to reference-SQL equality comparisons against string literals because FINCH lowercases literals while the database retains casing."
+      }
+    ]
+  },
+  "reference_audit": {
+    "requirements": [
+      "SQL executes successfully",
+      "result contains at least one row",
+      "result contains no NULL values",
+      "result is not a singleton numeric zero"
+    ]
+  },
+  "leakage_policy": {
+    "working_dev": "May be inspected for evaluator, prompt, and harness development; must not be used as few-shot or training data.",
+    "frozen_eval": "Questions, SQL, and results must remain uninspected during system development and must never be used for prompting, few-shot selection, synthetic generation, or training.",
+    "financial_database": "All 106 FINCH BIRD financial examples are excluded from few-shot pools and model-training data."
+  }
+}
