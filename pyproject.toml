@@ -2,13 +2,26 @@
 name = "domain-adapt"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "sqlglot>=30.18.0",
+]
 
 [dependency-groups]
 dev = [
     "ipykernel>=7.3.0",
+    "pytest>=9.1.1",
 ]
 
 [[tool.uv.index]]
 url = "https://packagefeedproxy.microsoft.io/pypi/simple"
 default = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/domain_adapt"]
