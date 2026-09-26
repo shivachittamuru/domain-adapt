@@ -3,6 +3,9 @@ name = "domain-adapt"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "azure-identity>=1.25.3",
+    "openai>=3.16.2",
+    "python-dotenv>=1.2.3",
     "sqlglot>=30.18.0",
 ]
 

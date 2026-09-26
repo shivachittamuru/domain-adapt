@@ -1,0 +1,24 @@
+{
+  "config_version": 1,
+  "name": "gpt-5.2-minimal-schema-v1",
+  "provider": "azure_openai",
+  "api": "responses",
+  "deployment_env": "AZURE_AI_MODEL_DEPLOYMENT_NAME",
+  "declared_underlying_model": "gpt-5.2",
+  "declared_model_version": "2025-12-11",
+  "instructions": "You translate natural-language questions into SQLite SQL.\n\nReturn exactly one executable SQLite query.\nUse only the tables and columns in the supplied schema.\nDo not include Markdown, code fences, comments, or explanations.\nDo not invent tables or columns.",
+  "max_output_tokens": 2000,
+  "context": {
+    "schema": "table names, column names, and declared types only",
+    "sample_rows": 0,
+    "few_shot_examples": 0,
+    "glossary": false,
+    "retrieval": false
+  },
+  "generation": {
+    "attempts_per_question": 1,
+    "store": false,
+    "candidate_sql_repair": false,
+    "retry_incorrect_answers": false
+  }
+}
