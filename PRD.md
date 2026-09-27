@@ -21,7 +21,7 @@ The initial implementation will use a **financial-domain Text-to-SQL workload** 
 
 The implementation domain is intentionally concrete, while the **DomainAdapt methodology remains domain-agnostic**.
 
-The initial candidate SLM will be **Phi-4** or the most suitable Phi-4-family model supported by the chosen Azure/Foundry fine-tuning path at implementation time.
+The initial candidate was expected to be **Phi-4** or a suitable Phi-4-family model. During implementation, the available Phi deployment required managed GPU compute that was too expensive for the baseline experiment, so **Ministral-3B** became the unadapted candidate SLM. The later fine-tuning target will be selected separately based on Azure/Foundry support, cost, and suitability; it does not have to be the baseline model.
 
 ---
 
@@ -89,7 +89,7 @@ The implementation process should therefore optimize for understanding, not spee
 Supporting questions:
 
 1. How well does a frontier model perform with a reasonable domain harness?
-2. How large is the capability gap when the same system uses Phi?
+2. How large is the capability gap when the same system uses the candidate SLM?
 3. Which failures are caused by retrieval/context/harness design?
 4. Which failures remain after deterministic improvements?
 5. Which remaining failures are systematic and learnable through SFT?
@@ -302,17 +302,17 @@ The project should progressively compare:
 ### Variant A — Frontier baseline
 Frontier model + minimal reasonable domain context.
 
-### Variant B — Frontier + improved harness
-Frontier model + retrieval/context/planning/validation improvements.
+### Variant B — Frontier + improved system
+Frontier model + retrieval, context, planning, and validation improvements.
 
-### Variant C — Phi baseline
-Unmodified Phi + same baseline environment.
+### Variant C — Candidate-SLM baseline
+Unmodified candidate SLM + same baseline environment.
 
-### Variant D — Phi + improved harness
-Same deterministic/context improvements as the frontier system.
+### Variant D — Candidate SLM + context/system improvements
+The same deterministic and context-engineering improvements applied around the candidate SLM.
 
-### Variant E — Phi + harness + SFT/LoRA
-Fine-tuned Phi used within the same improved harness.
+### Variant E — Adapted SLM + the selected system
+A suitable fine-tuned SLM used with the same selected context and deterministic components.
 
 Possible later variants:
 
@@ -439,26 +439,26 @@ Every sampled failure has an evidence-backed category.
 
 ---
 
-### Milestone 4 — Phi baseline
+### Milestone 4 — Candidate-SLM baseline
 
 Goal:
 Measure the domain capability gap.
 
 Activities:
-- run the same frozen evaluation with Phi,
+- run the same frozen evaluation with the candidate SLM,
 - keep prompt/context comparable,
-- compare frontier vs Phi,
+- compare frontier vs candidate SLM,
 - classify incremental failures.
 
 Deliverable:
-`04_phi_baseline.ipynb`
+`04_slm_baseline.ipynb`
 
 Validation:
 Capability-gap report.
 
 ---
 
-### Milestone 5 — Harness improvements
+### Milestone 5 — Context engineering and deterministic improvements
 
 Goal:
 Recover performance without changing model weights.
@@ -475,7 +475,7 @@ Possible experiments introduced one at a time:
 
 Deliverables:
 - one notebook per meaningful experiment or a clearly segmented notebook,
-- `05_harness_improvements.ipynb`.
+- `05_context_engineering.ipynb`.
 
 Validation:
 Measure incremental gain from each change.
@@ -488,7 +488,7 @@ Goal:
 Decide whether fine-tuning is justified.
 
 Activities:
-- inspect remaining Phi failures,
+- inspect remaining candidate-SLM failures,
 - isolate systematic/repetitive model behavior,
 - define adaptation target,
 - formulate hypothesis for SFT.
@@ -498,7 +498,7 @@ Deliverable:
 
 Example hypothesis:
 
-> Given correct schema context, Phi systematically struggles with multi-table aggregation and domain-semantic mappings. SFT on verified examples of these patterns should improve execution accuracy without changing retrieval.
+> Given correct schema context, the candidate SLM systematically struggles with multi-table aggregation and domain-semantic mappings. SFT on verified examples of these patterns should improve execution accuracy without changing retrieval.
 
 No fine-tuning begins until this hypothesis is evidence-backed.
 
@@ -526,7 +526,7 @@ Manually inspect a representative training sample set before training.
 
 ---
 
-### Milestone 8 — SFT with Phi on Azure / Foundry
+### Milestone 8 — SFT with a suitable SLM on Azure / Foundry
 
 Goal:
 Perform the first model adaptation experiment.
@@ -541,7 +541,7 @@ Activities:
 - save configuration and provenance.
 
 Deliverable:
-`08_phi_sft.ipynb` plus training configuration/notes.
+`08_slm_sft.ipynb` plus training configuration/notes.
 
 Validation:
 Successful custom model artifact and documented training run.
@@ -567,10 +567,10 @@ Key comparison:
 | System | Task success | Exec success | Domain errors | Latency | Cost |
 |---|---:|---:|---:|---:|---:|
 | Frontier baseline | TBD | TBD | TBD | TBD | TBD |
-| Frontier + harness | TBD | TBD | TBD | TBD | TBD |
-| Phi baseline | TBD | TBD | TBD | TBD | TBD |
-| Phi + harness | TBD | TBD | TBD | TBD | TBD |
-| Phi + harness + SFT | TBD | TBD | TBD | TBD | TBD |
+| Frontier + selected system | TBD | TBD | TBD | TBD | TBD |
+| Candidate-SLM baseline | TBD | TBD | TBD | TBD | TBD |
+| Candidate SLM + selected system | TBD | TBD | TBD | TBD | TBD |
+| Adapted SLM + selected system | TBD | TBD | TBD | TBD | TBD |
 
 ---
 
@@ -612,7 +612,8 @@ domain-adapt/
 │   ├── 01_dataset_and_eval.ipynb
 │   ├── 02_frontier_baseline.ipynb
 │   ├── 03_failure_analysis.ipynb
-│   ├── 04_phi_baseline.ipynb
+│   ├── 04_slm_baseline.ipynb
+│   ├── 05_context_engineering.ipynb
 │   └── ...
 │
 ├── src/
@@ -642,7 +643,7 @@ Initial preferences:
 - Jupyter notebooks for learning and experimentation
 - SQLite or DuckDB for local deterministic execution
 - Azure / Microsoft Foundry for hosted model experimentation and fine-tuning
-- Phi-4-family SLM
+- a small model supported by the selected Azure/Foundry baseline or adaptation path
 - one frontier model for reference baseline
 - standard Python evaluation utilities
 - Git/GitHub for versioning and public sharing
@@ -699,11 +700,11 @@ These may be added only after the core experiment is complete.
 DomainAdapt V1 succeeds if it can clearly demonstrate:
 
 1. a reproducible domain-specific benchmark,
-2. frontier and Phi baseline performance,
+2. frontier and candidate-SLM baseline performance,
 3. an evidence-based failure taxonomy,
-4. measurable gains from harness/context improvements,
+4. measurable gains from context and deterministic system improvements,
 5. an evidence-backed reason to attempt SFT,
-6. a reproducible Phi SFT/LoRA workflow on Azure/Foundry,
+6. a reproducible SFT/LoRA workflow on Azure/Foundry,
 7. a post-training evaluation on the untouched benchmark,
 8. attribution of gains to system improvements versus model adaptation,
 9. a concise transferable playbook for other domains,
