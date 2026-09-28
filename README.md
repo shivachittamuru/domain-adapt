@@ -15,6 +15,7 @@ and—only when justified—model adaptation.
 | 3 | `03_failure_analysis.ipynb` | Classify frontier working-set failures |
 | 4 | `04_slm_baseline.ipynb` | Measure the unadapted candidate-SLM gap |
 | 5 | `05_context_engineering.ipynb` | Test schema grounding, domain context, guardrails, and deterministic output handling |
+| 6 | `06_adaptation_hypothesis.ipynb` | Classify residual model gaps and decide whether adaptation is justified |
 
 “Context engineering” is used for Milestone 5 because most experiments change
 the information and instructions supplied to the model. A model harness is a
