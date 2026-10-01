@@ -8,6 +8,7 @@ import pytest
 from domain_adapt.context_engineering import (
     load_context_engineering_config,
     request_context_engineered_sql,
+    request_frontier_context_engineered_sql,
     unwrap_single_sql_fence,
     validate_context_engineering_config,
 )
@@ -45,6 +46,21 @@ class FakeChat:
 class FakeClient:
     def __init__(self, content):
         self.chat = FakeChat(content)
+
+
+class FakeResponses:
+    def __init__(self, output_text):
+        self.response = SimpleNamespace(output_text=output_text)
+        self.calls = []
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        return self.response
+
+
+class FakeFrontierClient:
+    def __init__(self, output_text):
+        self.responses = FakeResponses(output_text)
 
 
 @pytest.fixture
@@ -185,3 +201,34 @@ def test_invalid_config_prevents_model_call(config):
         )
 
     assert client.chat.completions.calls == []
+
+
+def test_frontier_wrapper_uses_same_context_contract_once(config):
+    client = FakeFrontierClient("```sql\nSELECT 1;\n```")
+    question = "Return one."
+
+    response, raw_sql, normalized_sql, was_unwrapped = (
+        request_frontier_context_engineered_sql(
+            client=client,
+            deployment_name="frontier-deployment",
+            question=question,
+            config=config,
+        )
+    )
+
+    assert response is client.responses.response
+    assert raw_sql == "```sql\nSELECT 1;\n```"
+    assert normalized_sql == "SELECT 1;"
+    assert was_unwrapped is True
+    assert client.responses.calls == [
+        {
+            "model": "frontier-deployment",
+            "instructions": config["instructions"],
+            "input": build_model_input(
+                config["schema_context"],
+                question,
+            ),
+            "max_output_tokens": config["max_tokens"],
+            "store": False,
+        }
+    ]

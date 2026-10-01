@@ -3,7 +3,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from domain_adapt.slm import request_sql
+from domain_adapt.frontier import request_sql as request_frontier_sql
+from domain_adapt.slm import request_sql as request_slm_sql
 
 
 EXPECTED_OUTPUT_NORMALIZATION = "strict single surrounding SQL-fence unwrap"
@@ -113,13 +114,34 @@ def request_context_engineered_sql(
 ) -> tuple[Any, str, str, bool]:
     """Request and strictly normalize one context-engineered SQL candidate."""
     validate_context_engineering_config(config)
-    response, raw_sql = request_sql(
+    response, raw_sql = request_slm_sql(
         client=client,
         deployment_name=deployment_name,
         instructions=config["instructions"],
         schema_context=config["schema_context"],
         question=question,
         max_tokens=config["max_tokens"],
+    )
+    normalized_sql, was_unwrapped = unwrap_single_sql_fence(raw_sql)
+    return response, raw_sql, normalized_sql, was_unwrapped
+
+
+def request_frontier_context_engineered_sql(
+    *,
+    client: Any,
+    deployment_name: str,
+    question: str,
+    config: dict[str, Any],
+) -> tuple[Any, str, str, bool]:
+    """Apply the frozen context contract through the Responses API."""
+    validate_context_engineering_config(config)
+    response, raw_sql = request_frontier_sql(
+        client=client,
+        deployment_name=deployment_name,
+        instructions=config["instructions"],
+        schema_context=config["schema_context"],
+        question=question,
+        max_output_tokens=config["max_tokens"],
     )
     normalized_sql, was_unwrapped = unwrap_single_sql_fence(raw_sql)
     return response, raw_sql, normalized_sql, was_unwrapped
