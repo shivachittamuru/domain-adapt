@@ -132,6 +132,7 @@ def request_frontier_context_engineered_sql(
     deployment_name: str,
     question: str,
     config: dict[str, Any],
+    reasoning_effort: str | None = None
 ) -> tuple[Any, str, str, bool]:
     """Apply the frozen context contract through the Responses API."""
     validate_context_engineering_config(config)

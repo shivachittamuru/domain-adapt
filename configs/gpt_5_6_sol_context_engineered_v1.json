@@ -1,0 +1,19 @@
+{
+  "config_version": 1,
+  "name": "gpt-5.6-sol-context-engineered-v1",
+  "provider": "azure_foundry",
+  "api": "responses",
+  "deployment_env": "AZURE_AI_ADVANCED_MODEL_DEPLOYMENT_NAME",
+  "project_endpoint_env": "AZURE_AI_PROJECT_ENDPOINT",
+  "declared_underlying_model": "gpt-5.6-sol",
+  "context_contract": "configs/slm_context_engineered_v1.json",
+  "context_contract_sha256": "574a775a2c91826a4d0073f78e84c40c3c4f5b6fbb61f656bd63f307252cdf68",
+  "reasoning_effort": "medium",
+  "generation": {
+    "attempts_per_question": 1,
+    "store": false,
+    "candidate_sql_repair": false,
+    "retry_incorrect_answers": false
+  },
+  "output_normalization": "strict single surrounding SQL-fence unwrap"
+}
